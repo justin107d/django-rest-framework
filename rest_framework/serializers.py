@@ -22,6 +22,7 @@ from django.core.exceptions import FieldDoesNotExist, ImproperlyConfigured
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import models
 from django.db.models.fields import Field as DjangoModelField
+from django.db.models.query import QuerySet
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -114,6 +115,8 @@ class BaseSerializer(Field):
             self.initial_data = data
         self.partial = kwargs.pop('partial', False)
         self._context = kwargs.pop('context', {})
+        if isinstance(instance, QuerySet) and kwargs.get('many', None) != True:
+            raise TypeError('Queryset has multiple instances.  Try submitting only one instance or set many=True')
         kwargs.pop('many', None)
         super().__init__(**kwargs)
 
